@@ -283,8 +283,6 @@ public class WeatherProvider extends ContentProvider {
 
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
-        } else {
-            throw new android.database.SQLException("Failed to delete row into " + uri);
         }
 
         // Student: return the actual rows deleted
@@ -331,8 +329,6 @@ public class WeatherProvider extends ContentProvider {
 
         if (rowsUpdate != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
-        } else {
-            throw new android.database.SQLException("Failed to update row into " + uri);
         }
 
         // Student: return the actual rows updated
