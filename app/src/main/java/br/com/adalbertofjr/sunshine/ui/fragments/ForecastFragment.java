@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,9 +29,9 @@ import java.text.SimpleDateFormat;
 import br.com.adalbertofjr.sunshine.FetchWeatherTask;
 import br.com.adalbertofjr.sunshine.ForecastAdapter;
 import br.com.adalbertofjr.sunshine.R;
-import br.com.adalbertofjr.sunshine.util.Utility;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
 import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
+import br.com.adalbertofjr.sunshine.util.Utility;
 
 /**
  * Sunshine
@@ -38,9 +41,10 @@ import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
  * Copyright © 2016 - Adalberto Fernandes Júnior. All rights reserved.
  */
 
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
+    private static final int FORECAST_LOADER = 0;
     private ForecastAdapter mForecastAdapter;
     private ListView mListView;
 
@@ -53,21 +57,16 @@ public class ForecastFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        String locationSetting = Utility.getPreferredLocation(getActivity());
-
-        // Sort order:  Ascending, by date.
-        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-                locationSetting, System.currentTimeMillis());
-
-        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
-                null, null, null, sortOrder);
-
-        mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
-
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
@@ -140,6 +139,7 @@ public class ForecastFragment extends Fragment {
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
         weatherTask.execute(location);
+        getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
     }
 
     /**
@@ -236,5 +236,37 @@ public class ForecastFragment extends Fragment {
         }
 
         return resultStrs;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+//        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+//                null, null, null, sortOrder);
+//
+//        mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
+
+        return new CursorLoader(getActivity(),
+                weatherForLocationUri,
+                null,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mForecastAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
     }
 }
