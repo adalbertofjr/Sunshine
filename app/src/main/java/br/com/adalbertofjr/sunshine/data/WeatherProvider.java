@@ -266,11 +266,12 @@ public class WeatherProvider extends ContentProvider {
         // the uri listeners (using the content resolver) if the rowsDeleted != 0 or the selection
         // is null.
         // Oh, and you should notify the listeners here.
+        // this makes delete all rows return the number of rows deleted
+        if (null == selection) selection = "1";
         switch (match) {
             case WEATHER: {
                 rowsDeleted = db.delete(WeatherContract.WeatherEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-
             }
             case LOCATION: {
                 rowsDeleted = db.delete(WeatherContract.LocationEntry.TABLE_NAME, selection, selectionArgs);
@@ -315,6 +316,7 @@ public class WeatherProvider extends ContentProvider {
         // Oh, and you should notify the listeners here.
         switch (match) {
             case WEATHER: {
+                normalizeDate(values);
                 rowsUpdate = db.update(WeatherContract.WeatherEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
