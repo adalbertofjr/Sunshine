@@ -77,21 +77,20 @@ public class DetailFragment extends Fragment {
         MenuItem shareItem = menu.findItem(R.id.action_share);
         ShareActionProvider myShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
-        setSharedIntent(myShareActionProvider);
+        if (myShareActionProvider != null) {
+            myShareActionProvider.setShareIntent(createShareForecastIntent());
+        } else {
+            Log.d(LOG_TAG, "Share Action Provider is null?");
+        }
     }
 
-    private void setSharedIntent(ShareActionProvider myShareActionProvider) {
-        if (myShareActionProvider != null) {
-            Intent shareIntent = new Intent();
-            shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, mForecastExtra + FORECST_SHARE_HASHTAG);
-            shareIntent.setType("text/plain");
-            startActivity(shareIntent);
-            myShareActionProvider.setShareIntent(shareIntent);
-        } else {
-            Log.d(LOG_TAG, "Share Action provider is null?");
-        }
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                mForecastExtra + FORECST_SHARE_HASHTAG);
+        return shareIntent;
     }
 
     @Override

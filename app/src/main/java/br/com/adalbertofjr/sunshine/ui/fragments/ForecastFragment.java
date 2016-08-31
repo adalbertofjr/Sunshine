@@ -30,6 +30,7 @@ import br.com.adalbertofjr.sunshine.FetchWeatherTask;
 import br.com.adalbertofjr.sunshine.ForecastAdapter;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
+import br.com.adalbertofjr.sunshine.ui.DetailActivity;
 import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
 import br.com.adalbertofjr.sunshine.util.Utility;
 
@@ -97,10 +98,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                String forecast = adapterView.getItemAtPosition(position).toString();
-//                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-//                detailIntent.putExtra(Intent.EXTRA_TEXT, forecast);
-//                startActivity(detailIntent);
+               // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    String locationSetting = Utility.getPreferredLocation(getActivity());
+                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
+                            ));
+                    startActivity(intent);
+                }
             }
         });
 
