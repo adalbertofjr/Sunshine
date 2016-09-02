@@ -1,9 +1,14 @@
 package br.com.adalbertofjr.sunshine.ui.fragments;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
@@ -18,6 +23,7 @@ import android.widget.TextView;
 
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
+import br.com.adalbertofjr.sunshine.util.Utility;
 
 /**
  * Sunshine
@@ -27,11 +33,13 @@ import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
  * Copyright © 2016 - Adalberto Fernandes Júnior. All rights reserved.
  */
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String FORECST_SHARE_HASHTAG = " #SunshineApp";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+    private static final int DETAIL_LOADER = 0;
     private String mForecastExtra;
+    private TextView mForecast;
 
     public DetailFragment() {
     }
@@ -55,16 +63,18 @@ public class DetailFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        mForecast = (TextView) rootView.findViewById(R.id.tv_detail_forecast);
 
-        TextView forecast = (TextView) rootView.findViewById(R.id.tv_detail_forecast);
-
-        if (!TextUtils.isEmpty(mForecastExtra)) {
-            forecast.setText(mForecastExtra);
-        }
 
         return rootView;
     }
@@ -104,5 +114,29 @@ public class DetailFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        // Sort order:  Ascending, by date.
+        Uri weatherForLocationUri = Uri.parse(mForecastExtra);
+
+        return new CursorLoader(getActivity(),
+                getActivity().getIntent().getData(),
+                ForecastFragment.FORECAST_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
