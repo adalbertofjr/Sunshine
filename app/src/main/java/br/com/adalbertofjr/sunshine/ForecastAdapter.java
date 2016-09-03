@@ -14,6 +14,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import br.com.adalbertofjr.sunshine.ui.fragments.ForecastFragment;
@@ -27,29 +28,6 @@ public class ForecastAdapter extends CursorAdapter {
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        boolean isMetric = Utility.isMetric(mContext);
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
-        return highLowStr;
-    }
-
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
-    private String convertCursorRowToUXFormat(Cursor cursor) {
-        String highAndLow = formatHighLows(
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP));
-
-        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE)) +
-                " - " + cursor.getString(ForecastFragment.COL_WEATHER_DESC) +
-                " - " + highAndLow;
     }
 
     /*
@@ -70,16 +48,30 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-        TextView tvDate = (TextView) view.findViewById(R.id.list_item_date_textview);
-        TextView tvForecast = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-        TextView tvHigh = (TextView) view.findViewById(R.id.list_item_high_textview);
-        TextView tvLow = (TextView) view.findViewById(R.id.list_item_low_textview);
+        // Read weather icon ID from cursor
+        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
+        // Use placeholder image for now
+        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
+        iconView.setImageResource(R.mipmap.ic_launcher);
 
-        boolean isMetric = Utility.isMetric(mContext);
+        long dateInMillis = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
+        TextView dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
+        dateView.setText(Utility.getFriendlyDayString(context, dateInMillis));
 
-        tvDate.setText(Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE)));
-        tvForecast.setText(cursor.getString(ForecastFragment.COL_WEATHER_DESC));
-        tvHigh.setText(Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric));
-        tvLow.setText(Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric));
+        String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        TextView descriptionView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+        descriptionView.setText(description);
+
+        // Read user preference for metric or imperial temperature units
+        boolean isMetric = Utility.isMetric(context);
+
+        // Read high temperature from cursor
+        double high = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
+        TextView highView = (TextView) view.findViewById(R.id.list_item_high_textview);
+        highView.setText(Utility.formatTemperature(high, isMetric));
+
+        double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
+        TextView lowView = (TextView) view.findViewById(R.id.list_item_low_textview);
+        lowView.setText(Utility.formatTemperature(low, isMetric));
     }
 }
