@@ -54,7 +54,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING,
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
             WeatherContract.LocationEntry.COLUMN_COORD_LAT,
-            WeatherContract.LocationEntry.COLUMN_COORD_LONG
+            WeatherContract.LocationEntry.COLUMN_COORD_LONG,
     };
 
     public static final int COL_WEATHER_ID = 0;
