@@ -128,7 +128,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.v(LOG_TAG, "In onLoadFinished");
-        if (!cursor.moveToFirst()) { return; }
+        if (!cursor.moveToFirst()) {
+            return;
+        }
 
         String dateString = Utility.formatDate(
                 cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
@@ -139,14 +141,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         boolean isMetric = Utility.isMetric(getActivity());
 
         String high = Utility.formatTemperature(
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric);
+                getActivity(),
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
+                isMetric);
 
         String low = Utility.formatTemperature(
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric);
+                getActivity(),
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP),
+                isMetric);
 
         mForecast = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
 
-        TextView detailTextView = (TextView)getView().findViewById(R.id.tv_detail_forecast);
+        TextView detailTextView = (TextView) getView().findViewById(R.id.tv_detail_forecast);
         detailTextView.setText(mForecast);
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
