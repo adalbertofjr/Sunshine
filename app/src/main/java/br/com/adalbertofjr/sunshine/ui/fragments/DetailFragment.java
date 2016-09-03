@@ -35,9 +35,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+
+    private String mForecast;
+
     private static final int DETAIL_LOADER = 0;
-    private String mForecastExtra;
-    private TextView mForecast;
+    private ShareActionProvider mShareActionProvider;
 
     public DetailFragment() {
     }
@@ -54,7 +56,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mForecastExtra = getArguments().getString(Intent.EXTRA_TEXT);
         setHasOptionsMenu(true);
     }
 
@@ -68,7 +69,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        mForecast = (TextView) rootView.findViewById(R.id.tv_detail_forecast);
 
         return rootView;
     }
@@ -79,10 +79,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         inflater.inflate(R.menu.menu_detail_fragment, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        ShareActionProvider myShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
-        if (myShareActionProvider != null) {
-            myShareActionProvider.setShareIntent(createShareForecastIntent());
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
@@ -92,8 +92,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                mForecast.getText() + FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mForecast + FORECAST_SHARE_HASHTAG);
         return shareIntent;
     }
 
@@ -110,33 +109,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        boolean isMetric = Utility.isMetric(getActivity());
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
-        return highLowStr;
-    }
-
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
-    private String convertCursorRowToUXFormat(Cursor cursor) {
-        String highAndLow = formatHighLows(
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP));
-
-        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE)) +
-                " - " + cursor.getString(ForecastFragment.COL_WEATHER_DESC) +
-                " - " + highAndLow;
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
+        Intent intent = getActivity().getIntent();
+        if (intent == null) {
+            return null;
+        }
+
         return new CursorLoader(getActivity(),
-                getActivity().getIntent().getData(),
+                intent.getData(),
                 ForecastFragment.FORECAST_COLUMNS,
                 null,
                 null,
@@ -146,10 +128,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.v(LOG_TAG, "In onLoadFinished");
+        if (!cursor.moveToFirst()) { return; }
 
-        if (!cursor.moveToNext()) return;
+        String dateString = Utility.formatDate(
+                cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
 
-        mForecast.setText(convertCursorRowToUXFormat(cursor));
+        String weatherDescription =
+                cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+
+        boolean isMetric = Utility.isMetric(getActivity());
+
+        String high = Utility.formatTemperature(
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric);
+
+        String low = Utility.formatTemperature(
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric);
+
+        mForecast = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
+
+        TextView detailTextView = (TextView)getView().findViewById(R.id.tv_detail_forecast);
+        detailTextView.setText(mForecast);
+
+        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        }
     }
 
     @Override
