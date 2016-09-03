@@ -182,19 +182,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null && cursor.moveToFirst()) {
             // Read weather condition ID from cursor
-            int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
+            int weatherId = cursor.getInt(COL_WEATHER_CONDITION_ID);
             // Use placeholder Image
-            mIconView.setImageResource(R.mipmap.ic_launcher);
+            mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
             // Read date from cursor and update views for day of week and date
-            long date = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
+            long date = cursor.getLong(COL_WEATHER_DATE);
             String friendlyDateText = Utility.getDayName(getActivity(), date);
             String dateText = Utility.getFormattedMonthDay(getActivity(), date);
             mFriendlyDateView.setText(friendlyDateText);
             mDateView.setText(dateText);
 
             // Read description from cursor and update view
-            String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+            String description = cursor.getString(COL_WEATHER_DESC);
             mDescriptionView.setText(description);
 
             // Read high temperature from cursor and update view
