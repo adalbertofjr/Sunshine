@@ -2,7 +2,6 @@ package br.com.adalbertofjr.sunshine.ui.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +33,7 @@ import br.com.adalbertofjr.sunshine.util.Utility;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String FORECST_SHARE_HASHTAG = " #SunshineApp";
+    private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private static final int DETAIL_LOADER = 0;
     private String mForecastExtra;
@@ -56,11 +54,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mForecastExtra = getArguments().getString(Intent.EXTRA_TEXT);
-
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -74,7 +69,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mForecast = (TextView) rootView.findViewById(R.id.tv_detail_forecast);
-
 
         return rootView;
     }
@@ -99,7 +93,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
-                mForecastExtra + FORECST_SHARE_HASHTAG);
+                mForecast.getText() + FORECAST_SHARE_HASHTAG);
         return shareIntent;
     }
 
@@ -116,12 +110,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Prepare the weather high/lows for presentation.
+     */
+    private String formatHighLows(double high, double low) {
+        boolean isMetric = Utility.isMetric(getActivity());
+        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
+        return highLowStr;
+    }
+
+    /*
+        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
+        string.
+     */
+    private String convertCursorRowToUXFormat(Cursor cursor) {
+        String highAndLow = formatHighLows(
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP));
+
+        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE)) +
+                " - " + cursor.getString(ForecastFragment.COL_WEATHER_DESC) +
+                " - " + highAndLow;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        // Sort order:  Ascending, by date.
-        Uri weatherForLocationUri = Uri.parse(mForecastExtra);
-
         return new CursorLoader(getActivity(),
                 getActivity().getIntent().getData(),
                 ForecastFragment.FORECAST_COLUMNS,
@@ -133,6 +146,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.v(LOG_TAG, "In onLoadFinished");
+
+        if (!cursor.moveToNext()) return;
+
+        mForecast.setText(convertCursorRowToUXFormat(cursor));
     }
 
     @Override
