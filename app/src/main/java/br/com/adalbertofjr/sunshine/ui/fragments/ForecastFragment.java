@@ -43,6 +43,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int FORECAST_LOADER = 0;
     private ForecastAdapter mForecastAdapter;
     private ListView mListView;
+    private String mLocation;
 
     public static final String[] FORECAST_COLUMNS = {
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -73,6 +74,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mLocation = Utility.getPreferredLocation(getActivity());
     }
 
     @Override
@@ -111,9 +113,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
+    public void onResume() {
+        super.onResume();
+        if (!mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
+            onLocationChanged();
+            mLocation = Utility.getPreferredLocation(getActivity());
+        }
     }
 
     @Override
@@ -142,6 +147,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onLocationChanged() {
+        updateWeather();
     }
 
     private void openPreferredLocationInMap() {
