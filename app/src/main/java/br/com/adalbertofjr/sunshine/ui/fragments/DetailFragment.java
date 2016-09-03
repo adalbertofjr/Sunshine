@@ -1,12 +1,15 @@
 package br.com.adalbertofjr.sunshine.ui.fragments;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
+import br.com.adalbertofjr.sunshine.util.Utility;
 
 /**
  * Sunshine
@@ -27,11 +31,15 @@ import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
  * Copyright © 2016 - Adalberto Fernandes Júnior. All rights reserved.
  */
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String FORECST_SHARE_HASHTAG = " #SunshineApp";
+    private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private String mForecastExtra;
+
+    private String mForecast;
+
+    private static final int DETAIL_LOADER = 0;
+    private ShareActionProvider mShareActionProvider;
 
     public DetailFragment() {
     }
@@ -48,23 +56,19 @@ public class DetailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mForecastExtra = getArguments().getString(Intent.EXTRA_TEXT);
-
         setHasOptionsMenu(true);
+    }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
-        TextView forecast = (TextView) rootView.findViewById(R.id.tv_detail_forecast);
-
-        if (!TextUtils.isEmpty(mForecastExtra)) {
-            forecast.setText(mForecastExtra);
-        }
 
         return rootView;
     }
@@ -75,23 +79,21 @@ public class DetailFragment extends Fragment {
         inflater.inflate(R.menu.menu_detail_fragment, menu);
 
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        ShareActionProvider myShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
-        setSharedIntent(myShareActionProvider);
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        } else {
+            Log.d(LOG_TAG, "Share Action Provider is null?");
+        }
     }
 
-    private void setSharedIntent(ShareActionProvider myShareActionProvider) {
-        if (myShareActionProvider != null) {
-            Intent shareIntent = new Intent();
-            shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, mForecastExtra + FORECST_SHARE_HASHTAG);
-            shareIntent.setType("text/plain");
-            startActivity(shareIntent);
-            myShareActionProvider.setShareIntent(shareIntent);
-        } else {
-            Log.d(LOG_TAG, "Share Action provider is null?");
-        }
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mForecast + FORECAST_SHARE_HASHTAG);
+        return shareIntent;
     }
 
     @Override
@@ -105,5 +107,56 @@ public class DetailFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
+        Intent intent = getActivity().getIntent();
+        if (intent == null) {
+            return null;
+        }
+
+        return new CursorLoader(getActivity(),
+                intent.getData(),
+                ForecastFragment.FORECAST_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+        if (!cursor.moveToFirst()) { return; }
+
+        String dateString = Utility.formatDate(
+                cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
+
+        String weatherDescription =
+                cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+
+        boolean isMetric = Utility.isMetric(getActivity());
+
+        String high = Utility.formatTemperature(
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric);
+
+        String low = Utility.formatTemperature(
+                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric);
+
+        mForecast = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
+
+        TextView detailTextView = (TextView)getView().findViewById(R.id.tv_detail_forecast);
+        detailTextView.setText(mForecast);
+
+        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
