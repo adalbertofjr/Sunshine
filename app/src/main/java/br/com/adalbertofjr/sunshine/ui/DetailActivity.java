@@ -1,6 +1,5 @@
 package br.com.adalbertofjr.sunshine.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -25,7 +24,6 @@ public class DetailActivity extends AppCompatActivity {
             fragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.weather_detail_container, new DetailFragment())
                     .add(R.id.weather_detail_container, fragment)
                     .commit();
         }
