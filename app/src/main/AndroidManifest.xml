@@ -16,21 +16,30 @@
             android:name=".data.WeatherProvider"
             android:authorities="br.com.adalbertofjr.sunshine" />
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/ForecastTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.DetailActivity"
-            android:label="@string/title_detail_activity"
+            android:label="@string/title_activity_detail"
             android:parentActivityName=".MainActivity" />
+
         <activity
             android:name=".ui.SettingsActivity"
-            android:label="@string/title_settings_activity"
-            android:parentActivityName=".MainActivity" />
-    </application>
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingsTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
 
+    </application>
 </manifest>

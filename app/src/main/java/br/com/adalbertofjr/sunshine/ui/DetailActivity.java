@@ -1,6 +1,5 @@
 package br.com.adalbertofjr.sunshine.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -14,18 +13,19 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        Intent intent = getIntent();
-        //String forecast = intent.getStringExtra(Intent.EXTRA_TEXT);
-        String mForecastStr = "";
+        if (savedInstanceState == null) {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
 
-        if (intent != null) {
-            mForecastStr = intent.getDataString();
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.weather_detail_container, fragment)
+                    .commit();
         }
-
-
-        DetailFragment df = DetailFragment.newInstance(mForecastStr);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fl_detail_container, df, null)
-                .commit();
-
     }
 }
