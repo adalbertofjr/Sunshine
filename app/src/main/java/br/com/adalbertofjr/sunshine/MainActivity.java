@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity
         } else {
             mTwoPane = false;
         }
+
+        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_forecast));
+        forecastFragment.setUseTodayLayout(!mTwoPane);
     }
 
     @Override
