@@ -15,17 +15,16 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         Intent intent = getIntent();
-        //String forecast = intent.getStringExtra(Intent.EXTRA_TEXT);
         String mForecastStr = "";
 
         if (intent != null) {
             mForecastStr = intent.getDataString();
         }
 
-
-        DetailFragment df = DetailFragment.newInstance(mForecastStr);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fl_detail_container, df, null)
-                .commit();
-
+        if (savedInstanceState == null) {
+            DetailFragment df = DetailFragment.newInstance(mForecastStr);
+            getSupportFragmentManager().beginTransaction().replace(R.id.weather_detail_container, df)
+                    .commit();
+        }
     }
 }
