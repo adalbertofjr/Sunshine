@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
 
         ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
