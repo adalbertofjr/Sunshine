@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import br.com.adalbertofjr.sunshine.sync.SunshineSyncAdapter;
 import br.com.adalbertofjr.sunshine.ui.DetailActivity;
 import br.com.adalbertofjr.sunshine.ui.fragments.DetailFragment;
 import br.com.adalbertofjr.sunshine.ui.fragments.ForecastFragment;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity
         ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_forecast));
         forecastFragment.setUseTodayLayout(!mTwoPane);
+
+        SunshineSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
