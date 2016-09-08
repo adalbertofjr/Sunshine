@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Vector;
 
 import br.com.adalbertofjr.sunshine.MainActivity;
@@ -302,8 +301,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 getContext().getContentResolver().delete(
                         WeatherContract.WeatherEntry.CONTENT_URI,
-                        WeatherContract.WeatherEntry.COLUMN_DATE + "< = ?",
-                        new String[]{Utility.formatDate(dayTime.setJulianDay(julianStartDay - 1))});
+                        WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
+                        new String[]{Long.toString(dayTime.setJulianDay(julianStartDay - 1))});
 
                 notifyWeather();
             }
