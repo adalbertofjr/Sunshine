@@ -19,7 +19,7 @@
         <!-- Registrando Content Provider -->
         <provider
             android:name=".data.WeatherProvider"
-            android:authorities="br.com.adalbertofjr.sunshine"
+            android:authorities="@string/content_authority"
             android:exported="false"
             android:syncable="true" />
 
@@ -47,10 +47,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-        <service android:name=".services.SunshineService" />
-
-        <receiver android:name=".services.SunshineService$AlarmReceiver" />
 
         <!-- SyncAdapter's dummy authentication service -->
         <service android:name=".sync.SunshineAuthenticatorService">
