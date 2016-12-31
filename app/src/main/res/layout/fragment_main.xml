@@ -5,18 +5,19 @@
     tools:context="br.com.adalbertofjr.sunshine.ui.fragments.ForecastFragment">
 
     <ListView
-        style="@style/ForecastListStyle"
         android:id="@+id/listview_forecast"
+        style="@style/ForecastListStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null" />
 
     <TextView
-        android:id="@+id/tv_emptyList"
+        android:id="@+id/listview_forecast_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/empty_forecast_list"/>
+        android:text="@string/empty_forecast_list" />
 
 </FrameLayout>
