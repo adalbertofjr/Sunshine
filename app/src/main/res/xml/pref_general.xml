@@ -5,12 +5,12 @@
     android:layout_height="match_parent">
 
     <br.com.adalbertofjr.sunshine.util.LocationEditTextPreference
+        android:title="@string/pref_location_label"
+        android:key="@string/pref_location_key"
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"
-        android:key="@string/pref_location_key"
         android:singleLine="true"
-        android:title="@string/pref_location_label"
-        custom:minLength="3" />
+        custom:minLength="3"/>
 
     <ListPreference
         android:defaultValue="@string/pref_units_metric"

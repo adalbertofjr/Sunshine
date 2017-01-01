@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
 import br.com.adalbertofjr.sunshine.sync.SunshineSyncAdapter;
-import br.com.adalbertofjr.sunshine.util.LocationEditTextPreference;
 import br.com.adalbertofjr.sunshine.util.Utility;
 
 /**
@@ -53,6 +52,8 @@ public class SettingsActivity extends PreferenceActivity
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
+
+
 
     /**
      * Attaches a listener so the summary is always updated with the preference value.
