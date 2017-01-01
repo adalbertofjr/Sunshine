@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
 import br.com.adalbertofjr.sunshine.sync.SunshineSyncAdapter;
+import br.com.adalbertofjr.sunshine.util.LocationEditTextPreference;
 import br.com.adalbertofjr.sunshine.util.Utility;
 
 /**
