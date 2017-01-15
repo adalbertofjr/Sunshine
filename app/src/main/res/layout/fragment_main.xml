@@ -4,20 +4,21 @@
     android:layout_height="match_parent"
     tools:context="br.com.adalbertofjr.sunshine.ui.fragments.ForecastFragment">
 
-    <ListView
-        android:id="@+id/listview_forecast"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_forecast"
         style="@style/ForecastListStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null" />
 
     <TextView
-        android:id="@+id/listview_forecast_empty"
+        android:id="@+id/recyclerview_forecast_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
         android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/empty_forecast_list" />
+        android:text="@string/empty_forecast_list"
+        android:visibility="gone"/>
 
 </FrameLayout>
