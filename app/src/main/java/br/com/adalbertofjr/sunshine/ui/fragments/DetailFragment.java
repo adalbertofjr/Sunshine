@@ -39,15 +39,22 @@ import br.com.adalbertofjr.sunshine.util.Utility;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String DETAILFRAGMENT_TAG = "DFTAG";
+    public static final String DETAIL_URI = "URI";
+    // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
+    // must change.
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE = 1;
+    public static final int COL_WEATHER_DESC = 2;
+    public static final int COL_WEATHER_MAX_TEMP = 3;
+    public static final int COL_WEATHER_MIN_TEMP = 4;
+    public static final int COL_WEATHER_HUMIDITY = 5;
+    public static final int COL_WEATHER_PRESSURE = 6;
+    public static final int COL_WEATHER_WIND_SPEED = 7;
+    public static final int COL_WEATHER_DEGREES = 8;
+    public static final int COL_WEATHER_CONDITION_ID = 9;
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    public static final String DETAIL_URI = "URI";
-
-    private String mForecast;
-
     private static final int DETAIL_LOADER = 0;
-    private ShareActionProvider mShareActionProvider;
-
     private static final String[] DETAIL_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
             WeatherEntry.COLUMN_DATE,
@@ -63,22 +70,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // weather data, even though they're stored in two different tables.
             WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING
     };
-
-    // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
-    // must change.
-    public static final int COL_WEATHER_ID = 0;
-    public static final int COL_WEATHER_DATE = 1;
-    public static final int COL_WEATHER_DESC = 2;
-    public static final int COL_WEATHER_MAX_TEMP = 3;
-    public static final int COL_WEATHER_MIN_TEMP = 4;
-    public static final int COL_WEATHER_HUMIDITY = 5;
-    public static final int COL_WEATHER_PRESSURE = 6;
-    public static final int COL_WEATHER_WIND_SPEED = 7;
-    public static final int COL_WEATHER_DEGREES = 8;
-    public static final int COL_WEATHER_CONDITION_ID = 9;
-
+    private String mForecast;
+    private ShareActionProvider mShareActionProvider;
     private ImageView mIconView;
-    private TextView mFriendlyDateView;
+    //    private TextView mFriendlyDateView;
     private TextView mDateView;
     private TextView mDescriptionView;
     private TextView mHighTempView;
@@ -124,7 +119,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
         mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
-        mFriendlyDateView = (TextView) rootView.findViewById(R.id.detail_day_textview);
+//        mFriendlyDateView = (TextView) rootView.findViewById(R.id.detail_day_textview);
         mDescriptionView = (TextView) rootView.findViewById(R.id.detail_forecast_textview);
         mHighTempView = (TextView) rootView.findViewById(R.id.detail_high_textview);
         mLowTempView = (TextView) rootView.findViewById(R.id.detail_low_textview);
@@ -202,8 +197,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // Read date from cursor and update views for day of week and date
             long date = cursor.getLong(COL_WEATHER_DATE);
             String friendlyDateText = Utility.getDayName(getActivity(), date);
-            String dateText = Utility.getFormattedMonthDay(getActivity(), date);
-            mFriendlyDateView.setText(friendlyDateText);
+            String dateText = Utility.getFriendlyDayString(getActivity(), date);
+//            mFriendlyDateView.setText(friendlyDateText);
             mDateView.setText(dateText);
 
             // Read description from cursor and update view
