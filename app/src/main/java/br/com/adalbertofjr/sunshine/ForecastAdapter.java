@@ -11,6 +11,7 @@ package br.com.adalbertofjr.sunshine;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,6 +102,10 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
                 .crossFade()
                 .into(holder.iconView);
 
+        // this enables better animations. even if we lose state due to a device rotation,
+        // the animator can use this to re-find the original view
+        ViewCompat.setTransitionName(holder.iconView, "iconView" + position);
+
         long dateInMillis = mCursor.getLong(ForecastFragment.COL_WEATHER_DATE);
         holder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
 
@@ -135,8 +140,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     }
 
     public void selectView(RecyclerView.ViewHolder viewHolder) {
-        if ( viewHolder instanceof ForecastAdapterViewHolder ) {
-            ForecastAdapterViewHolder vfh = (ForecastAdapterViewHolder)viewHolder;
+        if (viewHolder instanceof ForecastAdapterViewHolder) {
+            ForecastAdapterViewHolder vfh = (ForecastAdapterViewHolder) viewHolder;
             vfh.onClick(vfh.itemView);
         }
     }

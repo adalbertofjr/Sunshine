@@ -30,7 +30,6 @@ import com.bumptech.glide.Glide;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
 import br.com.adalbertofjr.sunshine.data.WeatherContract.WeatherEntry;
-import br.com.adalbertofjr.sunshine.ui.DetailActivity;
 import br.com.adalbertofjr.sunshine.ui.SettingsActivity;
 import br.com.adalbertofjr.sunshine.util.Utility;
 
@@ -45,6 +44,7 @@ import br.com.adalbertofjr.sunshine.util.Utility;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String DETAILFRAGMENT_TAG = "DFTAG";
     public static final String DETAIL_URI = "URI";
+    public static final String DETAIL_TRANSITION_ANIMATION = "DTA";
     // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
     // must change.
     public static final int COL_WEATHER_ID = 0;
@@ -87,6 +87,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mWindView;
     private TextView mPressureView;
     private Uri mUri;
+    private boolean mTransitionAnimation;
 
     public DetailFragment() {
     }
@@ -118,6 +119,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+            mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail_start, container, false);
@@ -268,7 +270,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
         // We need to start the enter transition after the data has loaded
-        if (activity instanceof DetailActivity) {
+        if (mTransitionAnimation) {
             activity.supportStartPostponedEnterTransition();
 
             if (null != toolbarView) {
