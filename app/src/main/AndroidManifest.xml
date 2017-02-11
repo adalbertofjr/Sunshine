@@ -17,6 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyC1tBJo2bFX9FqlUfg7pOSWCHFRwEr6qxE"/>
+
         <!-- Registrando Content Provider -->
         <provider
             android:name=".data.WeatherProvider"
