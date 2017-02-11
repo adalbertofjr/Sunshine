@@ -26,6 +26,7 @@ import br.com.adalbertofjr.sunshine.util.Utility;
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
+    public final static int PLACE_PICKER_REQUEST = 9090;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
