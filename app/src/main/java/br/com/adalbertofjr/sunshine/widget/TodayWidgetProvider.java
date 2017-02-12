@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import br.com.adalbertofjr.sunshine.services.TodayWidgetIntentService;
 import br.com.adalbertofjr.sunshine.sync.SunshineSyncAdapter;
 
 /**

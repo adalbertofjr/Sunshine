@@ -1,4 +1,4 @@
-package br.com.adalbertofjr.sunshine.services;
+package br.com.adalbertofjr.sunshine.widget;
 
 import android.annotation.TargetApi;
 import android.app.IntentService;
@@ -18,7 +18,6 @@ import br.com.adalbertofjr.sunshine.MainActivity;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
 import br.com.adalbertofjr.sunshine.util.Utility;
-import br.com.adalbertofjr.sunshine.widget.TodayWidgetProvider;
 
 /**
  * TodayWidgetIntentService

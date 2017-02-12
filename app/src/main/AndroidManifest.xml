@@ -87,6 +87,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".widget.TodayWidgetIntentService" />
+
         <service android:name=".fcm.SunshineFCMService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
