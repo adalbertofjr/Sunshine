@@ -39,6 +39,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     final private ForecastAdapterOnClickHandler mClickHandler;
     final private View mEmptyView;
     final private ItemChoiceManager mICM;
+    boolean useLongToday;
 
     public ForecastAdapter(Context context, ForecastAdapterOnClickHandler dh, View emptyView, int choiceMode) {
         mContext = context;
@@ -57,10 +58,12 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
             switch (viewType) {
                 case VIEW_TYPE_TODAY: {
                     layoutId = R.layout.list_item_forecast_today;
+                    useLongToday = true;
                     break;
                 }
                 case VIEW_TYPE_FUTURE_DAY: {
                     layoutId = R.layout.list_item_forecast;
+                    useLongToday = false;
                     break;
                 }
             }
@@ -107,7 +110,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         ViewCompat.setTransitionName(holder.iconView, "iconView" + position);
 
         long dateInMillis = mCursor.getLong(ForecastFragment.COL_WEATHER_DATE);
-        holder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
+        holder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis, useLongToday));
 
         String description = mCursor.getString(ForecastFragment.COL_WEATHER_DESC);
         holder.descriptionView.setText(description);
