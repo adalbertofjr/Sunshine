@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutionException;
 import br.com.adalbertofjr.sunshine.MainActivity;
 import br.com.adalbertofjr.sunshine.R;
 import br.com.adalbertofjr.sunshine.data.WeatherContract;
+import br.com.adalbertofjr.sunshine.muzei.WeatherMuzeiSource;
 import br.com.adalbertofjr.sunshine.util.Constants;
 import br.com.adalbertofjr.sunshine.util.Utility;
 
@@ -369,6 +370,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                         new String[]{Long.toString(dayTime.setJulianDay(julianStartDay - 1))});
 
                 updateWidgets();
+                updateMuzei();
                 notifyWeather();
             }
 
@@ -381,6 +383,17 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             Utility.setLocationStatus(getContext(), LOCATION_STATUS_SERVER_INVALID);
         }
     }
+
+    private void updateMuzei() {
+        // Muzei is only compatible with Jelly Bean MR1+ devices, so there's no need to update the
+        // Muzei background on lower API level devices
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Context context = getContext();
+            context.startService(new Intent(ACTION_DATA_UPDATED)
+                    .setClass(context, WeatherMuzeiSource.class));
+        }
+    }
+
 
     private void updateWidgets() {
         Context context = getContext();
